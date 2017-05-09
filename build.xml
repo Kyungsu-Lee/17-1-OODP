@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="euc-kr"?>
+
+<project default="jar" basedir=".">
+
+<property name="src" value="src"/>
+<property name="bin" value="bin"/>
+<property name="lib" value="lib"/>
+
+<target name="init">
+	<delete dir="${bin}"/>
+	<mkdir dir="${bin}"/>
+	
+</target>
+
+<target name="build" depends="init">
+	<javac srcdir="${src}" destdir="${bin}"/>
+</target>
+
+ <target name="jar" depends="build">
+	<move todir="bin/list.txt">
+    		<fileset file="src/list.txt"/>
+  	</move>
+        <mkdir dir="./bin/jar"/>
+        <jar destfile="./bin/jar/Program.jar" basedir="bin/">
+            <manifest>
+                <attribute name="Main-Class" value="Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+<target name="run" depends="jar">
+	<java jar="./bin/jar/Program.jar" fork="true"/>
+</target>
+
+<target name="clean">
+	<delete dir="${bin}"/>
+</target>
+
+</project>
