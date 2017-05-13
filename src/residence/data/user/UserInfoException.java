@@ -1,4 +1,4 @@
-package residence.user;
+package residence.data.user;
 
 public class UserInfoException extends Exception
 {

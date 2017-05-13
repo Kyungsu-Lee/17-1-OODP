@@ -5,8 +5,9 @@ import java.net.*;
 import java.io.*;
 import java.util.Scanner;
 
-import residence.user.*;
-import residence.hotel.*;
+import residence.data.*;
+import residence.data.user.*;
+import residence.data.hotel.*;
 
 public class Main extends Applet implements ActionListener 
 {
@@ -19,13 +20,13 @@ public class Main extends Applet implements ActionListener
 	Panel loginBox;
 	TextField loginTextBox;
 
-	UserInfoDBManager db;
-	HotelInfoDBManager hotelInfo;
+	DBManager db;
+	DBManager hotelInfo;
 
 	public void init()
 	{
 		db = UserInfoDBManager.getInstance();
-		db.readInfo("data");
+		db.readInfo("data", "user");
 
 		f = new Frame();
 		f.setSize(getSize().width, getSize().height);
@@ -174,7 +175,7 @@ public class Main extends Applet implements ActionListener
 				{
 				if(e.getKeyCode() == 10)
 				{
-				if(db.validateUser(id.getText(), pwd.getText()))
+				if(db.validate(id.getText(), pwd.getText()))
 				{
 				loginFrame.setVisible(false);
 				actualMain();
@@ -362,7 +363,7 @@ public class Main extends Applet implements ActionListener
 		actualMainFrame.setVisible(true);
 
 		hotelInfo = HotelInfoDBManager.getInstance();
-		hotelInfo.readInfo("hotel");
+		hotelInfo.readInfo("hotel", "hotel");
 	}
 
 	Thread searchThread;
@@ -380,10 +381,10 @@ public class Main extends Applet implements ActionListener
 		content.setLayout(new BorderLayout());
 		final List list = new List(hotelInfo.getCount());
 		
-		hotelNames = hotelInfo.getNames();
+		hotelNames = hotelInfo.getKeys();
 
-		for(int i=0; i<hotelInfo.getNames().length; i++)
-			list.add((String)hotelInfo.getNames()[i]);
+		for(int i=0; i<hotelInfo.getKeys().length; i++)
+			list.add((String)hotelInfo.getKeys()[i]);
 		list.select(0);
 		content.add(list, BorderLayout.WEST);
 		
@@ -471,13 +472,13 @@ public class Main extends Applet implements ActionListener
 				while(true)
 				{
 					int hotelIndex = list.getSelectedIndex();
-					HotelInfo info = hotelInfo.getInfos((String)hotelNames[hotelIndex]);
+					HotelInfo info = (HotelInfo)hotelInfo.getInfo((String)(hotelNames[hotelIndex]));
 		//			System.out.println(hotelIndex);
 					if(hotelIndex >= 0)
 					hotel_name_label.setText((String)hotelNames[hotelIndex]);
-					hotel_price_label.setText("    가격 : " + info.getPrice());
-					hotel_number_label.setText("    인원 : " + info.getNumber());
-					hotel_location_label.setText("    장소 : " + info.getLocation());
+					hotel_price_label.setText("    가격 : " + info.getProperty(2));
+					hotel_number_label.setText("    인원 : " + info.getProperty(1));
+					hotel_location_label.setText("    장소 : " + info.getProperty(0));
 					try
 					{
 						Thread.sleep(300);
@@ -492,6 +493,29 @@ public class Main extends Applet implements ActionListener
 
 		searchThread.start();
 
+		content.revalidate();
+		validate();
+	}
+
+	
+	public void shoppingList()
+	{
+		content.removeAll();
+		content.setLayout(new BorderLayout());
+
+		final List list = new List(hotelInfo.getCount());
+		
+		hotelNames = hotelInfo.getKeys();
+
+		for(int i=0; i<hotelInfo.getKeys().length; i++)
+			list.add((String)hotelInfo.getKeys()[i]);
+		list.select(0);
+		content.add(list, BorderLayout.WEST);
+
+		Panel p = new Panel();
+		p.setLayout(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+		
 		content.revalidate();
 		validate();
 	}
@@ -512,7 +536,7 @@ public class Main extends Applet implements ActionListener
 		}
 		else if(e.getActionCommand().equals("tologin"))
 		{
-			if(db.validateUser(id.getText(), pwd.getText()))
+			if(db.validate(id.getText(), pwd.getText()))
 			{
 				loginFrame.setVisible(false);
 				actualMain();
@@ -539,10 +563,10 @@ public class Main extends Applet implements ActionListener
 				bw = new BufferedWriter(osw);  
 
 				int age = Integer.parseInt(sign_text[3].getText());
-				if(db.contains(sign_text[0].getText()))
+				if(db.containsKey(sign_text[0].getText()))
 					throw new Exception();
 
-				UserInfo info = new UserInfo(sign_text[0].getText(), sign_text[1].getText(), sign_text[2].getText(), age);
+				UserInfo info = new UserInfo(sign_text[0].getText(), sign_text[1].getText(), sign_text[2].getText(), Integer.toString(age));
 
 				bw.write(info.toFormatString());
 				//	bw.newLine();
@@ -565,6 +589,10 @@ public class Main extends Applet implements ActionListener
 		else if(e.getActionCommand().equals(btn_name[0]))	//숙박업체 조회
 		{
 			searchHotel();
+		}
+		else if(e.getActionCommand().equals(btn_name[1]))	//장바구니 조회
+		{
+			shoppingList();
 		}
 	}
 }
