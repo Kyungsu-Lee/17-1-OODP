@@ -6,8 +6,9 @@ import java.io.*;
 import java.util.Scanner;
 
 import residence.user.*;
+import residence.hotel.*;
 
-public class Main extends Applet implements ActionListener
+public class Main extends Applet implements ActionListener 
 {
 	Panel nPanel, sPanel, cPanel, tcPanel, bcPanel;
 	Button  panel_log, panel_signIn;
@@ -19,6 +20,7 @@ public class Main extends Applet implements ActionListener
 	TextField loginTextBox;
 
 	UserInfoDBManager db;
+	HotelInfoDBManager hotelInfo;
 
 	public void init()
 	{
@@ -175,7 +177,7 @@ public class Main extends Applet implements ActionListener
 				if(db.validateUser(id.getText(), pwd.getText()))
 				{
 				loginFrame.setVisible(false);
-				login_success();
+				actualMain();
 				}
 				else
 				{
@@ -209,21 +211,6 @@ public class Main extends Applet implements ActionListener
 		loginFrame.add(btn_login);
 		loginFrame.setVisible(true);	
 
-	}
-
-	Frame login_succ_frame;
-	public void login_success()
-	{
-		login_succ_frame = new Frame();
-		login_succ_frame.setSize(getSize());
-		login_succ_frame.setLayout(new BorderLayout());
-
-		Label l = new Label("Success");
-		l.setFont(new Font("Arial",Font.PLAIN, 50));
-		l.setAlignment(Label.CENTER);
-		login_succ_frame.add(l, BorderLayout.CENTER);
-
-		login_succ_frame.setVisible(true);
 	}
 
 	Frame sign_frame;
@@ -300,9 +287,193 @@ public class Main extends Applet implements ActionListener
 		sign_frame.setVisible(true);	
 	}
 
+	Frame actualMainFrame;
+	Panel sideBar;
+	Panel content;
+	Panel body;
+	Button[] btns;
+	String[] btn_name;
+	public void actualMain()
+	{
+		actualMainFrame = new Frame();
+		actualMainFrame.setSize(getSize().width, getSize().height);
+		actualMainFrame.setLayout (new BorderLayout());
+
+		Panel title = new Panel();
+
+		title.setLayout (new FlowLayout(FlowLayout.CENTER));
+		title.setBackground(new Color(255, 255, 240));  // give it color so you can see it
+		Label titles = new Label("숙박 예약 서비스");
+		title.add(titles);
+		titles.setFont(new Font("Arial",Font.PLAIN, 15));
+
+		Panel subTitle = new Panel();       // south Panel will just hold one Label
+		subTitle.setLayout(new FlowLayout(FlowLayout.CENTER));
+		subTitle.setBackground(new Color(255, 255, 240));  // give it color so you can see it
+		Label bottom = new Label("Made by Group-C");
+		bottom.setFont(new Font("Arial",Font.PLAIN, 15));
+		subTitle.add(bottom);
+
+		GridBagLayout gb1 = new GridBagLayout();
+		GridBagLayout gb2 = new GridBagLayout();
+		GridBagConstraints gc = new GridBagConstraints();
+
+		body = new Panel();
+		body.setSize(getSize().width, (int)(getSize().height * 8 / 10.0));
+		body.setLayout(gb1);
+
+		sideBar = new Panel();
+		sideBar.setLayout(new GridLayout(10, 1));
+		gc.weightx = 1.0;
+		gc.weighty = 3.0;
+		gc.gridx = 0;
+		gc.gridy = 0;
+		gc.fill = GridBagConstraints.BOTH;
+
+		btns = new Button[10];
+		btn_name = new String[]
+		{
+			"숙박업체 조회",
+				"장바구니 조회"
+		};
+		for(int i=0; i<btn_name.length; i++)
+		{
+			btns[i] = new Button(btn_name[i]);
+			btns[i].addActionListener(this);
+			btns[i].setActionCommand(btn_name[i]);
+			sideBar.add(btns[i]);
+		}
+
+		body.add(sideBar, gc);
+
+
+		content = new Panel();
+		gc.weightx = 3.0;
+		gc.weighty = 3.0;
+		gc.gridx = 1;
+		gc.gridy = 0;
+		body.add(content, gc);
+
+
+		actualMainFrame.add(title, BorderLayout.NORTH);
+		actualMainFrame.add(subTitle, BorderLayout.SOUTH);
+		actualMainFrame.add(body, BorderLayout.CENTER);
+
+		actualMainFrame.setVisible(true);
+
+		hotelInfo = HotelInfoDBManager.getInstance();
+		hotelInfo.readInfo("hotel");
+	}
+
+	Thread searchThread;
+	Object[] hotelNames;
+	Label hotel_name_label = new Label();
+	Button hotel_list_btn;
+	Label hotel_price_label = new Label("   가격");
+	Label hotel_location_label = new Label("   지역");
+	Label hotel_number_label = new Label("  인원");
+	
+	public void searchHotel()
+	{
+		content.removeAll();
+		content.setLayout(new BorderLayout());
+		final List list = new List(hotelInfo.getCount());
+		
+		hotelNames = hotelInfo.getNames();
+
+		for(int i=0; i<hotelInfo.getNames().length; i++)
+			list.add((String)hotelInfo.getNames()[i]);
+		list.select(0);
+		content.add(list, BorderLayout.WEST);
+		
+		Panel p = new Panel();
+		p.setLayout(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+	
+		gc.weightx = 4.0;
+		gc.weighty = 1.0;
+		gc.fill = GridBagConstraints.HORIZONTAL;
+
+		hotel_name_label.setAlignment(Label.CENTER);
+		hotel_name_label.setFont(new Font("Arial",Font.PLAIN, 20));
+		gc.gridx = 0;
+		gc.gridy = 0;
+		p.add(hotel_name_label, gc);
+
+
+		hotel_location_label.setFont(new Font("Arial",Font.PLAIN, 15));
+		gc.weightx = 1.0;
+		gc.weighty = 1.0;
+		gc.fill = GridBagConstraints.HORIZONTAL;
+		gc.gridx = 0;
+		gc.gridy = 4;
+		p.add(hotel_location_label, gc);
+
+		hotel_price_label.setFont(new Font("Arial",Font.PLAIN, 15));
+		gc.weightx = 1.0;
+		gc.weighty = 1.0;
+		gc.fill = GridBagConstraints.HORIZONTAL;
+		gc.gridx = 0;
+		gc.gridy = 5;
+		p.add(hotel_price_label, gc);
+
+		hotel_number_label.setFont(new Font("Arial",Font.PLAIN, 15));
+		gc.weightx = 1.0;
+		gc.weighty = 1.0;
+		gc.fill = GridBagConstraints.HORIZONTAL;
+		gc.gridx = 0;
+		gc.gridy = 6;
+		p.add(hotel_number_label, gc);
+
+		hotel_list_btn = new Button("장바구니에 담기");
+		gc.weightx = 4.0;
+		gc.weighty = 10.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 0;
+		gc.gridy = 20;
+		p.add(hotel_list_btn, gc);
+
+		content.add(p, BorderLayout.CENTER);
+
+		searchThread = new Thread()
+		{
+			@Override
+			public void run()
+			{
+				while(true)
+				{
+					int hotelIndex = list.getSelectedIndex();
+					HotelInfo info = hotelInfo.getInfos((String)hotelNames[hotelIndex]);
+		//			System.out.println(hotelIndex);
+					if(hotelIndex >= 0)
+					hotel_name_label.setText((String)hotelNames[hotelIndex]);
+					hotel_price_label.setText("    가격 : " + info.getPrice());
+					hotel_number_label.setText("    인원 : " + info.getNumber());
+					hotel_location_label.setText("    장소 : " + info.getLocation());
+					try
+					{
+						Thread.sleep(300);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}	
+			}
+		};
+
+		searchThread.start();
+
+		content.revalidate();
+		validate();
+	}
+
 
 	public void actionPerformed(ActionEvent e) 
 	{
+		if(searchThread != null)
+			searchThread.stop();
+
 		if(e.getActionCommand().equals("login"))
 		{
 			event_login();
@@ -316,7 +487,7 @@ public class Main extends Applet implements ActionListener
 			if(db.validateUser(id.getText(), pwd.getText()))
 			{
 				loginFrame.setVisible(false);
-				login_success();
+				actualMain();
 			}
 			else
 			{
@@ -344,24 +515,28 @@ public class Main extends Applet implements ActionListener
 					throw new Exception();
 
 				UserInfo info = new UserInfo(sign_text[0].getText(), sign_text[1].getText(), sign_text[2].getText(), age);
-			
+
 				bw.write(info.toFormatString());
-			//	bw.newLine();
+				//	bw.newLine();
 				bw.flush();
-			
+
 				sign_frame.setVisible(false);
 				f.setVisible(true);
 			}	
 			catch(Exception ne)
 			{
 				ne.printStackTrace();
-				
+
 				sign_frame.setVisible(false);
 				for(TextField tf : sign_text)
 					tf.setText("");
 				repaint();
 				sign_frame.setVisible(true);
 			}
+		}
+		else if(e.getActionCommand().equals(btn_name[0]))	//숙박업체 조회
+		{
+			searchHotel();
 		}
 	}
 }
