@@ -56,7 +56,7 @@ public class HotelInfoDBManager
 		try
 		{
 			URL dataStream = new URL("http://119.202.36.218/applet/" + fileName);
-			BufferedReader in = new BufferedReader(new InputStreamReader(dataStream.openStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(dataStream.openStream(), "UTF-8") );
 
 			String s;
 
