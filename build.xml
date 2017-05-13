@@ -13,7 +13,7 @@
 </target>
 
 <target name="build" depends="init">
-	<javac srcdir="${src}" destdir="${bin}"/>
+	<javac srcdir="${src}" destdir="${bin}" includeantruntime="false"/>
 </target>
 
  <target name="jar" depends="build">
