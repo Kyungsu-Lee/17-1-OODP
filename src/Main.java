@@ -372,6 +372,7 @@ public class Main extends Applet implements ActionListener
 	Label hotel_price_label = new Label("   가격");
 	Label hotel_location_label = new Label("   지역");
 	Label hotel_number_label = new Label("  인원");
+	Panel hotel_image_viewer = new Panel();
 	
 	public void searchHotel()
 	{
@@ -427,13 +428,40 @@ public class Main extends Applet implements ActionListener
 
 		hotel_list_btn = new Button("장바구니에 담기");
 		gc.weightx = 4.0;
-		gc.weighty = 10.0;
+		gc.weighty = 3.0;
 		gc.fill = GridBagConstraints.BOTH;
 		gc.gridx = 0;
 		gc.gridy = 20;
 		p.add(hotel_list_btn, gc);
 
+		hotel_image_viewer = new Panel()
+		{
+			private int margin = 30;
+
+			@Override
+			public void paint(Graphics g)
+			{
+				try
+				{
+					URL url = new URL("http://119.202.36.218/hgushop/hgulist/img/1/1.jpg");
+					Image img = getImage(url);
+					g.drawImage(img, margin, margin, this.getSize().width - margin, this.getSize().height - margin, this);
+				}catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+		};
+		gc.weightx = 4.0;
+		gc.weighty = 7.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 0;
+		gc.gridy = 15;
+		p.add(hotel_image_viewer, gc);
+
 		content.add(p, BorderLayout.CENTER);
+
 
 		searchThread = new Thread()
 		{
