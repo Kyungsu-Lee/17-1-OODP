@@ -7,6 +7,7 @@ public class HotelInfo extends DBInfo
 	/*
 	*	key : name
 	*	property
+	*		name
 	*		location
 	*		number
 	*		price
@@ -14,7 +15,7 @@ public class HotelInfo extends DBInfo
 	*/
 	public HotelInfo()
 	{
-		properties = new String[4];
+		properties = new String[5];
 	}
 
 	public HotelInfo(String name, String location, int number, String price, String imageURL)
@@ -22,23 +23,20 @@ public class HotelInfo extends DBInfo
 		key = name;
 		properties = new String[4];
 
-		properties[0] = location;
-		properties[1] = number;
-		properties[2] = price;
-		properties[3] = imageURL;
+		properties[0] = name;
+		properties[1] = location;
+		properties[2] = number;
+		properties[3] = price;
+		properties[4] = imageURL;
 	}
 
 	public HotelInfo(String[] args)
 	{
-		if(args.length < 4) return;
-
 		key = args[0];
-		properties = new String[4];
+		properties = new String[5];
 
-		properties[0] = args[1];
-		properties[1] = args[2];
-		properties[2] = args[3];
-		properties[3] = args[4];
+		for(int i=0; i<5; i++)
+			properties[i] = args[i];
 	}
 
 	@Override

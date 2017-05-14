@@ -12,8 +12,7 @@ public class Main
 	public static void main(String[] args)	
 	{
 		DBManager db = UserInfoDBManager.getInstance();
-		db.readInfo("data", "user");
 
-		System.out.println(new UserInfo("aaa", "aaa", "aaa", "1").toFormatString());
+		db.writeInfo(new UserInfo("lee", "asd", "name", "20"));
 	}
 }

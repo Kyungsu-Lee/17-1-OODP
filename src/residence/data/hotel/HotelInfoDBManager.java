@@ -7,6 +7,19 @@ import java.net.*;
 
 public class HotelInfoDBManager extends DBManager
 {
+	public static final String TYPE = "hotel";
+	public static final String[] PROPERTIESNAME = 
+	{
+		"name",
+		"location",
+		"number",
+		"price",
+		"imageURL"
+	};
+
+	public String getType() { return this.TYPE; };
+	public String[] getPropertiesName() { return this.PROPERTIESNAME; }
+
 	private static HotelInfoDBManager instance = null;
 
 	private HotelInfoDBManager()

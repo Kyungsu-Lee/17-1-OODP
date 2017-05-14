@@ -8,6 +8,7 @@ import java.util.Scanner;
 import residence.data.*;
 import residence.data.user.*;
 import residence.data.hotel.*;
+import residence.applet.*;
 
 public class Main extends Applet implements ActionListener 
 {
@@ -26,7 +27,7 @@ public class Main extends Applet implements ActionListener
 	public void init()
 	{
 		db = UserInfoDBManager.getInstance();
-		db.readInfo("data", "user");
+		db.readInfo("data/data");
 
 		f = new Frame();
 		f.setSize(getSize().width, getSize().height);
@@ -363,7 +364,7 @@ public class Main extends Applet implements ActionListener
 		actualMainFrame.setVisible(true);
 
 		hotelInfo = HotelInfoDBManager.getInstance();
-		hotelInfo.readInfo("hotel", "hotel");
+		hotelInfo.readInfo("data/hotel");
 	}
 
 	Thread searchThread;
@@ -373,25 +374,25 @@ public class Main extends Applet implements ActionListener
 	Label hotel_price_label = new Label("   가격");
 	Label hotel_location_label = new Label("   지역");
 	Label hotel_number_label = new Label("  인원");
-	Panel hotel_image_viewer = new Panel();
-	
+	ImageView hotel_image_viewer = new ImageView();
+	HotelInfo info;
+	GridBagConstraints gc = new GridBagConstraints();
 	public void searchHotel()
 	{
 		content.removeAll();
 		content.setLayout(new BorderLayout());
 		final List list = new List(hotelInfo.getCount());
-		
+
 		hotelNames = hotelInfo.getKeys();
 
 		for(int i=0; i<hotelInfo.getKeys().length; i++)
 			list.add((String)hotelInfo.getKeys()[i]);
 		list.select(0);
 		content.add(list, BorderLayout.WEST);
-		
-		Panel p = new Panel();
+
+		final Panel p = new Panel();
 		p.setLayout(new GridBagLayout());
-		GridBagConstraints gc = new GridBagConstraints();
-	
+
 		gc.weightx = 4.0;
 		gc.weighty = 1.0;
 		gc.fill = GridBagConstraints.HORIZONTAL;
@@ -435,25 +436,6 @@ public class Main extends Applet implements ActionListener
 		gc.gridy = 20;
 		p.add(hotel_list_btn, gc);
 
-		hotel_image_viewer = new Panel()
-		{
-			private int margin = 30;
-
-			@Override
-			public void paint(Graphics g)
-			{
-				try
-				{
-					URL url = new URL("http://119.202.36.218/hgushop/hgulist/img/1/1.jpg");
-					Image img = getImage(url);
-					g.drawImage(img, margin, margin, this.getSize().width - margin, this.getSize().height - margin, this);
-				}catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-
-		};
 		gc.weightx = 4.0;
 		gc.weighty = 7.0;
 		gc.fill = GridBagConstraints.BOTH;
@@ -466,19 +448,37 @@ public class Main extends Applet implements ActionListener
 
 		searchThread = new Thread()
 		{
-			@Override
+			int listIdx = -1;
+
 			public void run()
 			{
 				while(true)
 				{
 					int hotelIndex = list.getSelectedIndex();
-					HotelInfo info = (HotelInfo)hotelInfo.getInfo((String)(hotelNames[hotelIndex]));
-		//			System.out.println(hotelIndex);
+					info = (HotelInfo)hotelInfo.getInfo((String)(hotelNames[hotelIndex]));
+					//			System.out.println(hotelIndex);
 					if(hotelIndex >= 0)
-					hotel_name_label.setText((String)hotelNames[hotelIndex]);
+						hotel_name_label.setText((String)hotelNames[hotelIndex]);
 					hotel_price_label.setText("    가격 : " + info.getProperty(2));
 					hotel_number_label.setText("    인원 : " + info.getProperty(1));
 					hotel_location_label.setText("    장소 : " + info.getProperty(0));
+
+					if(hotelIndex != listIdx)
+					{
+						listIdx = hotelIndex;
+						try
+						{
+							URL url = new URL("http://119.202.36.218/images/applet/" + info.getProperty(3) + ".jpg");
+							Image img = getImage(url);
+							hotel_image_viewer.changeImage(img);
+
+							content.revalidate();
+							validate();
+						}catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
 					try
 					{
 						Thread.sleep(300);
@@ -497,14 +497,14 @@ public class Main extends Applet implements ActionListener
 		validate();
 	}
 
-	
+
 	public void shoppingList()
 	{
 		content.removeAll();
 		content.setLayout(new BorderLayout());
 
 		final List list = new List(hotelInfo.getCount());
-		
+
 		hotelNames = hotelInfo.getKeys();
 
 		for(int i=0; i<hotelInfo.getKeys().length; i++)
@@ -515,7 +515,7 @@ public class Main extends Applet implements ActionListener
 		Panel p = new Panel();
 		p.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
-		
+
 		content.revalidate();
 		validate();
 	}
