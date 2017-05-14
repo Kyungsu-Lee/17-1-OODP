@@ -10,7 +10,7 @@ import residence.data.*;
 
 public class BasketInfoDBManager extends DBManager
 {
-	public static final String TYPE = "user";
+	public static final String TYPE = "basket";
 	public static final String[] PROPERTIESNAME = 
 	{
 		"id",
@@ -28,7 +28,7 @@ public class BasketInfoDBManager extends DBManager
 	{
 	}
 
-	public static DBManager getInstace()
+	public static DBManager getInstance()
 	{
 		if(instance == null)
 			instance = new BasketInfoDBManager();

@@ -54,12 +54,5 @@ public abstract class DBInfo
 			properties[i] = property[i];
 	}
 
-	public DBInfo set(String[] args)
-	{
-		key = args[0];
-		for(int i=0; i<properties.length; i++)
-			properties[i] = args[i+1];
-
-		return this;
-	}
+	public abstract DBInfo set(String[] args);
 }

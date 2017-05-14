@@ -20,16 +20,27 @@ public class BasketInfo extends DBInfo
 	public BasketInfo(String id, String hotel_name, String date, String number)
 	{
 		initialize(4);
-		this.key = hotel_name + ":" + date;
+		this.key = hotel_name + ":" + hotel_name +":"+ date + ":"+ number;
 		this.properties[0] = id;
 		this.properties[1] = hotel_name;
 		this.properties[2] = date;
 		this.properties[3] = number;
 	}
 
+	public DBInfo set(String[] args)
+	{
+		initialize(4);
+		this.key = args[0] + ":" + args[1] + ":" + args[2] + ":" + args[3];
+		for(int i=0; i<4; i++)
+			this.properties[i] = args[i];
+
+		return this;
+	}
+
 	public BasketInfo(String[] args)
 	{
-		this.key = args[0];
+		initialize(4);
+		this.key = args[0] + ":" + args[1] + ":" + args[2] + ":" + args[3];
 		for(int i=0; i<4; i++)
 			this.properties[i] = args[i];
 	}

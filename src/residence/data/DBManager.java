@@ -20,7 +20,7 @@ public abstract class DBManager
 	{
 		keys.add(key);
 	}
-	
+
 	public void addInfo(DBInfo data)
 	{
 		addKey(data.getKey());
@@ -46,28 +46,44 @@ public abstract class DBManager
 		return tmp.toArray();
 	}
 
-	public void readInfo(String fileName)
+	public void readInfo()
 	{
-		try
-		{
-			URL dataStream = new URL("http://119.202.36.218/applet/" + fileName);
-			BufferedReader in = new BufferedReader(new InputStreamReader(dataStream.openStream(), "UTF-8") );
+		StringBuilder jsonHtml = new StringBuilder();
+		try{
 
-			String s;
-
-			/*
-			 *	file format : name, location, number, price, imageURL 
-			 *	token : \t
-			 */
-			while ((s = in.readLine()) != null) {
-				String[] tmp = s.split("\t");
-				addInfo(new DBFactory().makeInfos(getType()).set(tmp));	//add imageURL
+			// 연결 url 설정
+			URL url = new URL("http://119.202.36.218/applet/Server/"+ getType() + "_read.php");
+			// 커넥션 객체 생성
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			// 연결되었으면.
+			if(conn != null){
+				conn.setConnectTimeout(10000);
+				conn.setUseCaches(false);
+				// 연결되었음 코드가 리턴되면.
+				if(conn.getResponseCode() == HttpURLConnection.HTTP_OK)
+				{
+					BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+					for(;;)
+					{
+						// 웹상에 보여지는 텍스트를 라인단위로 읽어 저장.
+						String line = br.readLine();
+						if(line == null) break;
+						// 저장된 텍스트 라인을 jsonHtml에 붙여넣음
+						String[] tmp = line.split("\t");
+						DBInfo in = new DBFactory().makeInfos(getType()).set(tmp);
+						
+						addInfo(in);	//add imageURL
+					}
+					br.close();
+				}
+				conn.disconnect();
 			}
+
+		} catch(Exception ex){
+			ex.printStackTrace();
 		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+
+		System.out.println(jsonHtml.toString());
 	}
 
 	public void writeInfo(DBInfo info)
@@ -109,7 +125,6 @@ public abstract class DBManager
 
 	}
 
-	@Override
 	public String toString()
 	{
 		String str = "";

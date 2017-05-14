@@ -36,7 +36,7 @@ public class UserInfoDBManager extends DBManager
 
 	public boolean validate(String id, String pwd)
 	{
-		return containsKey(id) && pwd.equals(properties.get(id).getProperty(0));
+		return containsKey(id) && pwd.equals(properties.get(id).getProperty(1));
 	}
 
 }

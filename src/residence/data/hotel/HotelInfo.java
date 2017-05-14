@@ -39,6 +39,16 @@ public class HotelInfo extends DBInfo
 			properties[i] = args[i];
 	}
 
+	public DBInfo set(String[] args)
+	{
+		key = args[0];
+		properties = new String[5];
+
+		for(int i=0; i<5; i++)
+			properties[i] = args[i];
+		return this;
+	}
+
 	@Override
 	public boolean equals(Object o)
 	{

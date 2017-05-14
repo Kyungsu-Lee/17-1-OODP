@@ -36,6 +36,17 @@ public class UserInfo extends DBInfo
 		UserInfoDBManager.getInstance().addInfo(this);
 	}
 
+	public DBInfo set(String[] args)
+	{
+		this.key = args[0];
+		this.properties = new String[4];	//pwd, name, age
+		this.properties[0] = args[0];
+		this.properties[1] = args[1];
+		this.properties[2] = args[2];
+		this.properties[3] = args[3];
+
+		return this;
+	}
 
 	@Override
 	public boolean equals(Object o)
