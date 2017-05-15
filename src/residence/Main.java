@@ -3,6 +3,7 @@ package residence;
 import residence.data.*;
 import residence.data.user.*;
 import residence.data.hotel.*;
+import residence.data.basket.*;
 import java.util.Scanner;
 
 public class Main
@@ -11,8 +12,8 @@ public class Main
 
 	public static void main(String[] args)	
 	{
-		DBManager db = UserInfoDBManager.getInstance();
+		BasketInfoDBManager db = (BasketInfoDBManager)BasketInfoDBManager.getInstance();
 
-		db.writeInfo(new UserInfo("lee", "asd", "name", "20"));
+		db.delete(new BasketInfo("lmasi", args[0], "20170512", "5"));
 	}
 }

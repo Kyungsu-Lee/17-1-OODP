@@ -553,17 +553,18 @@ public class Main extends Applet implements ActionListener
 	}
 
 
+	Object[] keys;
 	public void shoppingList()
 	{
 		content.removeAll();
 		content.setLayout(new BorderLayout());
 
-		DBManager basketInfo = BasketInfoDBManager.getInstance();
+		final DBManager basketInfo = BasketInfoDBManager.getInstance();
 		basketInfo.readInfo();
 
 		final List list = new List(basketInfo.getCount());
 
-		Object[] keys = basketInfo.getKeys();
+		keys = basketInfo.getKeys();
 		for(Object key : keys)
 			System.out.println(key.toString());
 
@@ -576,6 +577,30 @@ public class Main extends Applet implements ActionListener
 		Panel p = new Panel();
 		p.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
+
+		hotel_list_btn = new Button("장바구니에 삭제");
+		gc.weightx = 5.0;
+		gc.weighty = 3.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 0;
+		gc.gridy = 20;
+		gc.gridwidth= 10;
+		p.add(hotel_list_btn, gc);
+		hotel_list_btn.addActionListener(new ActionListener()
+				{
+				public void actionPerformed(ActionEvent e)
+				{
+				if(list.getSelectedIndex() == -1) return;
+
+				BasketInfo in = new BasketInfo(SYSTEM.getId(), (String)basketInfo.getInfo((String)keys[list.getSelectedIndex()]).getProperty(1), "20170512", "5");
+				System.out.println(keys[list.getSelectedIndex()].toString());
+				((BasketInfoDBManager)BasketInfoDBManager.getInstance()).delete(in);			
+				list.remove((String)basketInfo.getInfo((String)keys[list.getSelectedIndex()]).getProperty(1));
+		content.revalidate();
+		validate();
+				}
+				});
+		content.add(p, BorderLayout.CENTER);
 
 		content.revalidate();
 		validate();
