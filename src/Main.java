@@ -42,7 +42,8 @@ public class Main extends Applet implements ActionListener
 	private void homeActivity()
 	{
 		nPanel = new Panel();              // north panel will hold three button
-		nPanel.setBackground(new Color(255,255,240));  // give it color so you can see it
+		//nPanel.setBackground(new Color(255,255,240));  // give it color so you can see it
+		nPanel.setBackground(new Color(255,100,100));  //theme1
 		nPanel.setSize(getSize().width, getSize().height/10);
 
 		nPanel.setLayout (new FlowLayout(FlowLayout.CENTER));
@@ -51,7 +52,8 @@ public class Main extends Applet implements ActionListener
 		title.setFont(new Font("Arial",Font.PLAIN, 15));
 
 		sPanel = new Panel();       // south Panel will just hold one Label
-		sPanel.setBackground(new Color(255, 255, 240));  // give it color so you can see it
+		//sPanel.setBackground(new Color(255, 255, 240));  // give it color so you can see it
+		sPanel.setBackground(new Color(255, 100, 100));		//theme1
 		bottom = new Label("Made by Group-C");
 		bottom.setFont(new Font("Arial",Font.PLAIN, 15));
 
@@ -82,8 +84,10 @@ public class Main extends Applet implements ActionListener
 		f.add(sPanel, BorderLayout.SOUTH);
 		f.add(cPanel, BorderLayout.CENTER);
 
-		panel_log.setForeground(new Color(255, 0, 0));
-		panel_signIn.setForeground(new Color(99, 171, 235));
+		//panel_log.setForeground(new Color(255, 0, 0));
+		panel_log.setForeground(new Color(200, 150, 10)); 	//theme1
+		//panel_signIn.setForeground(new Color(99, 171, 235));
+		panel_signIn.setForeground(new Color(100, 200, 100));//theme1
 		panel_log.setFont(new Font("Arial",Font.PLAIN,40));
 		panel_signIn.setFont(new Font("Arial",Font.PLAIN,40));
 
