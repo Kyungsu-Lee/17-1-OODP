@@ -27,8 +27,6 @@ public class theme1Main extends Applet implements ActionListener
 	DBManager hotelInfo;
 	CurrentUser SYSTEM;
 
-	SetColor setColor = new SetColor();
-	
 	public void init()
 	{
 		db = UserInfoDBManager.getInstance();
@@ -48,15 +46,12 @@ public class theme1Main extends Applet implements ActionListener
 		panel_signIn.addActionListener(this);
 		panel_signIn.setActionCommand("signin");
 	}
-	
 
 	private void homeActivity()
 	{
 		nPanel = new Panel();              // north panel will hold three button
 		//nPanel.setBackground(new Color(255,255,240));  // give it color so you can see it
-		//setColor.setPanelColor(nPanel);
-		//setColor.init1();
-		setColor.setPanelColor(nPanel);	//작동함!
+		nPanel.setBackground(new Color(255,100,100));	//theme 1
 		nPanel.setSize(getSize().width, getSize().height/10);
 
 		nPanel.setLayout (new FlowLayout(FlowLayout.CENTER));
@@ -66,7 +61,7 @@ public class theme1Main extends Applet implements ActionListener
 
 		sPanel = new Panel();       // south Panel will just hold one Label
 		//sPanel.setBackground(new Color(255, 255, 240));  // give it color so you can see it
-		setColor.setPanelColor(sPanel);	//작동함!
+		sPanel.setBackground(new Color(255,100,100));	//theme 1
 		bottom = new Label("Made by Group-C");
 		bottom.setFont(new Font("Arial",Font.PLAIN, 15));
 
@@ -97,10 +92,11 @@ public class theme1Main extends Applet implements ActionListener
 		f.add(sPanel, BorderLayout.SOUTH);
 		f.add(cPanel, BorderLayout.CENTER);
 
-		panel_log.setForeground(new Color(255, 0, 0));
-		setColor.setColorButton(panel_log);	//작동함!
-		panel_signIn.setForeground(new Color(99, 171, 235));
-		setColor.setColorButton(panel_signIn);	//작동함!
+		//panel_log.setForeground(new Color(255, 0, 0));
+		panel_log.setForeground(new Color(250, 171, 200));		//theme1
+		//panel_signIn.setForeground(new Color(99, 171, 235));
+		panel_signIn.setForeground(new Color(150, 200, 190));	//theme1
+		
 		panel_log.setFont(new Font("Arial",Font.PLAIN,40));
 		panel_signIn.setFont(new Font("Arial",Font.PLAIN,40));
 
@@ -317,14 +313,16 @@ public class theme1Main extends Applet implements ActionListener
 		Panel title = new Panel();
 
 		title.setLayout (new FlowLayout(FlowLayout.CENTER));
-		title.setBackground(new Color(255, 255, 240));  // give it color so you can see it
+		//title.setBackground(new Color(255, 255, 240));  // give it color so you can see it
+		title.setBackground(new Color(255, 255, 140));  // theme1
 		Label titles = new Label("숙박 예약 서비스");
 		title.add(titles);
 		titles.setFont(new Font("Arial",Font.PLAIN, 15));
 
 		Panel subTitle = new Panel();       // south Panel will just hold one Label
 		subTitle.setLayout(new FlowLayout(FlowLayout.CENTER));
-		subTitle.setBackground(new Color(255, 255, 240));  // give it color so you can see it
+		//subTitle.setBackground(new Color(255, 255, 240));  // give it color so you can see it
+		subTitle.setBackground(new Color(255, 255, 140));  // theme1
 		Label bottom = new Label("Made by Group-C");
 		bottom.setFont(new Font("Arial",Font.PLAIN, 15));
 		subTitle.add(bottom);
@@ -672,3 +670,4 @@ public class theme1Main extends Applet implements ActionListener
 		}
 	}
 }
+
