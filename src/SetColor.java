@@ -11,7 +11,19 @@ public class SetColor extends Applet {
 	}*/
 	
 	public void setPanelColor(Panel nPanel){
-		nPanel.setBackground(new Color(255,100,100)); 
+		nPanel.setBackground(new Color(255,100,100)); 	//봄
+	}
+	
+	public void setPanelColor1(Panel nPanel){
+		nPanel.setBackground(new Color(0,255,0)); 	//여름 - 초록
+	}
+	
+	public void setPanelColor2(Panel nPanel){
+		nPanel.setBackground(new Color(255,128,64)); 	//가을 - 주황
+	}
+	
+	public void setPanelColor3(Panel nPanel){
+		nPanel.setBackground(new Color(255,255,255)); 	//겨울 - 완전 흰색
 	}
 	
 	public void setColorButton(Button b){
