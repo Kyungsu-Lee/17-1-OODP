@@ -1,3 +1,5 @@
+package residence.applet;
+
 import java.awt.*;
 
 public class ImageView extends Panel

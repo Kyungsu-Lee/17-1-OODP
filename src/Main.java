@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.net.*;
 import java.io.*;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 import residence.data.*;
 import residence.data.user.*;
@@ -11,6 +12,7 @@ import residence.data.hotel.*;
 import residence.data.basket.*;
 import residence.system.*;
 import residence.applet.*;
+import residence.data.list.*;
 
 public class Main extends Applet implements ActionListener 
 {
@@ -26,6 +28,8 @@ public class Main extends Applet implements ActionListener
 	DBManager db;
 	DBManager hotelInfo;
 	CurrentUser SYSTEM;
+
+	BasketList basketList = new BasketList();
 
 	public void init()
 	{
@@ -340,7 +344,10 @@ public class Main extends Applet implements ActionListener
 		btn_name = new String[]
 		{
 			"숙박업체 조회",
-				"장바구니 조회"
+			"장바구니 조회",
+			"메일 보내기",
+			"Mail Box",
+			"숙소 등록하기"
 		};
 		for(int i=0; i<btn_name.length; i++)
 		{
@@ -473,9 +480,9 @@ public class Main extends Applet implements ActionListener
 				public void actionPerformed(ActionEvent e)
 				{
 				if(list.getSelectedIndex() == -1) return;
-
-				BasketInfo in = new BasketInfo(SYSTEM.getId(), (String)hotelNames[list.getSelectedIndex()], "20170512", "5");
-				BasketInfoDBManager.getInstance().writeInfo(in);			
+				
+				BasketInfo in = new BasketInfo(SYSTEM.getId(), (String)hotelNames[list.getSelectedIndex()], "20170512", (String)wanna.getSelectedItem());
+				BasketInfoDBManager.getInstance().writeInfo(in);
 				}
 				});
 
@@ -561,22 +568,33 @@ public class Main extends Applet implements ActionListener
 
 		final DBManager basketInfo = BasketInfoDBManager.getInstance();
 		basketInfo.readInfo();
+		for(Object o : basketInfo.getKeys())
+		{
+			basketList.addItem(new BasketItem((BasketInfo)basketInfo.getInfo((String)o)));
+		}
 
 		final List list = new List(basketInfo.getCount());
 
-		keys = basketInfo.getKeys();
-		for(Object key : keys)
-			System.out.println(key.toString());
+		Iterator iter = basketList.iterator();
 
-		for(int i=0; i<keys.length; i++)
-			if(basketInfo.getInfo((String)keys[i]).getProperty(0).equals(SYSTEM.getId()))
-				list.add((String)basketInfo.getInfo((String)keys[i]).getProperty(1));
-		list.select(0);
+		while(iter.hasNext())
+			list.add(((BasketItem)iter.next()).getHotelName());
+
+		//list.select(0);
 		content.add(list, BorderLayout.WEST);
 
 		Panel p = new Panel();
 		p.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
+
+		Button hotel_list_btns = new Button("삭제");
+		gc.weightx = 5.0;
+		gc.weighty = 3.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 0;
+		gc.gridy = 10;
+		gc.gridwidth= 10;
+		p.add(hotel_list_btns, gc);
 
 		hotel_list_btn = new Button("장바구니에 삭제");
 		gc.weightx = 5.0;
@@ -593,11 +611,16 @@ public class Main extends Applet implements ActionListener
 				if(list.getSelectedIndex() == -1) return;
 
 				BasketInfo in = new BasketInfo(SYSTEM.getId(), (String)basketInfo.getInfo((String)keys[list.getSelectedIndex()]).getProperty(1), "20170512", "5");
+				basketList.remove(new BasketItem(in));
 				System.out.println(keys[list.getSelectedIndex()].toString());
-				((BasketInfoDBManager)BasketInfoDBManager.getInstance()).delete(in);			
-				list.remove((String)basketInfo.getInfo((String)keys[list.getSelectedIndex()]).getProperty(1));
-		content.revalidate();
-		validate();
+				((BasketInfoDBManager)BasketInfoDBManager.getInstance()).delete(in);
+				list.removeAll();
+				Iterator iter = basketList.iterator();
+
+				while(iter.hasNext())
+				list.add(((BasketItem)iter.next()).getHotelName());
+				content.revalidate();
+				validate();
 				}
 				});
 		content.add(p, BorderLayout.CENTER);
@@ -605,6 +628,257 @@ public class Main extends Applet implements ActionListener
 		content.revalidate();
 		validate();
 	}
+
+	public void sendMail()
+	{
+		content.removeAll();
+		content.setLayout(new BorderLayout());
+
+		Panel p = new Panel();
+		p.setLayout(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+
+		Label tol = new Label("To : ");
+		gc.weightx = 1.0;
+		gc.weighty = 0.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 0;
+		gc.gridy = 1;
+		gc.gridwidth= 1;
+		p.add(tol, gc);
+
+		final TextField to = new TextField();
+		gc.weightx = 5.0;
+		gc.weighty = 0.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 1;
+		gc.gridy = 1;
+		gc.gridwidth= 1;
+		p.add(to, gc);
+
+		final TextField hotel_list_btns = new TextField();
+		gc.weightx = 5.0;
+		gc.weighty = 3.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 0;
+		gc.gridy = 10;
+		gc.gridwidth= 10;
+		p.add(hotel_list_btns, gc);
+
+		hotel_list_btn = new Button("메일 보내기");
+		gc.weightx = 5.0;
+		gc.weighty = 3.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 0;
+		gc.gridy = 20;
+		gc.gridwidth= 2;
+		p.add(hotel_list_btn, gc);
+
+		hotel_list_btn.addActionListener(new ActionListener()
+				{
+				public void actionPerformed(ActionEvent e)
+				{
+				try
+				{
+
+				String link="http://119.202.36.218/applet/Server/" + "message" + ".php";
+				String data = "";
+				data += URLEncoder.encode("from", "UTF-8") + "=" + URLEncoder.encode(SYSTEM.getId(), "UTF-8");
+				data += "&" + URLEncoder.encode("to", "UTF-8") + "=" + URLEncoder.encode(to.getText(), "UTF-8");
+				data += "&" + URLEncoder.encode("message", "UTF-8") + "=" + URLEncoder.encode(hotel_list_btns.getText(), "UTF-8");
+
+				URL url = new URL(link);
+				URLConnection conn = url.openConnection();
+
+				conn.setDoOutput(true);
+				OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+				wr.write( data );
+				wr.flush();
+
+				BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+				StringBuilder sb = new StringBuilder();
+				String line = null;
+
+				// Read Server Response
+				while((line = reader.readLine()) != null)
+				{
+					sb.append(line);
+					break;
+				}
+
+				System.out.println(sb.toString());
+				}catch(Exception ee)
+				{
+					ee.printStackTrace();
+				}
+
+				}
+				});
+		content.add(p, BorderLayout.CENTER);
+
+		content.revalidate();
+		validate();
+	}
+
+
+	public void mailBox()
+	{
+		content.removeAll();
+		content.setLayout(new BorderLayout());
+
+		Panel p = new Panel();
+		p.setLayout(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+
+
+		ArrayList<String> message = new ArrayList<>();
+		try{
+			// 연결 url 설정
+			URL url = new URL("http://119.202.36.218/applet/Server/"+ "message" + "_read.php");
+			// 커넥션 객체 생성
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			// 연결되었으면.
+			if(conn != null){
+				conn.setConnectTimeout(10000);
+				conn.setUseCaches(false);
+				// 연결되었음 코드가 리턴되면.
+				if(conn.getResponseCode() == HttpURLConnection.HTTP_OK)
+				{
+					BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+					for(;;)
+					{
+						// 웹상에 보여지는 텍스트를 라인단위로 읽어 저장.
+						String line = br.readLine();
+						if(line == null) break;
+						// 저장된 텍스트 라인을 jsonHtml에 붙여넣음
+						String[] tmp = line.split("::::");
+						if(tmp[1].equals(SYSTEM.getId()))
+							message.add("Message from : " + tmp[0] + "          ::" + tmp[2] + "\n");
+					}
+					br.close();
+				}
+				conn.disconnect();
+			}
+
+		} catch(Exception ex){
+			ex.printStackTrace();
+		}
+
+		for(int i=0; i<message.size(); i++)
+		{
+		Label hotel_list_btn = new Label(message.get(i));
+		gc.weightx = 1.0;
+		gc.weighty = 0.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 0;
+		gc.gridy = i;
+		gc.gridwidth= 1;
+		p.add(hotel_list_btn, gc);
+		}
+		content.add(p, BorderLayout.CENTER);
+
+
+		content.revalidate();
+		validate();
+	}
+	TextField[] hotels;
+	public void addHotel()
+	{
+		content.removeAll();
+		content.setLayout(new BorderLayout());
+
+		Panel p = new Panel();
+		p.setLayout(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+
+		final String[] names = {
+			"이름",
+			"장소",
+			"가격",
+			"최대 인원"
+		};
+		hotels = new TextField[names.length];
+		for(int i=0; i<names.length; i++)
+		{
+		Label tol = new Label("이름 : ");
+		gc.weightx = 1.0;
+		gc.weighty = 0.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 0;
+		gc.gridy = i;
+		gc.gridwidth= 1;
+		p.add(tol, gc);
+
+		hotels[i] = new TextField();
+		gc.weightx = 5.0;
+		gc.weighty = 0.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 1;
+		gc.gridy = i;
+		gc.gridwidth= 1;
+		p.add(hotels[i], gc);
+		}
+
+		hotel_list_btn = new Button("추기");
+		gc.weightx = 5.0;
+		gc.weighty = 3.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.gridx = 0;
+		gc.gridy = 20;
+		gc.gridwidth= 2;
+		p.add(hotel_list_btn, gc);
+
+		hotel_list_btn.addActionListener(new ActionListener()
+				{
+				public void actionPerformed(ActionEvent e)
+				{
+				try
+				{
+
+				String link="http://119.202.36.218/applet/Server/" + "hotel_add" + ".php";
+				String data = "";
+				data += URLEncoder.encode("name", "UTF-8") + "=" + URLEncoder.encode(hotels[0].getText(), "UTF-8");
+				data += "&" + URLEncoder.encode("location", "UTF-8") + "=" + URLEncoder.encode(hotels[1].getText(), "UTF-8");
+				data += "&" + URLEncoder.encode("price", "UTF-8") + "=" + URLEncoder.encode(hotels[2].getText(), "UTF-8");
+				data += "&" + URLEncoder.encode("num", "UTF-8") + "=" + URLEncoder.encode(hotels[3].getText(), "UTF-8");
+
+				URL url = new URL(link);
+				URLConnection conn = url.openConnection();
+
+				conn.setDoOutput(true);
+				OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+				wr.write( data );
+				wr.flush();
+
+				BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+				StringBuilder sb = new StringBuilder();
+				String line = null;
+
+				// Read Server Response
+				while((line = reader.readLine()) != null)
+				{
+					sb.append(line);
+					break;
+				}
+
+				System.out.println(sb.toString());
+				}catch(Exception ee)
+				{
+					ee.printStackTrace();
+				}
+
+				}
+				});
+		content.add(p, BorderLayout.CENTER);
+
+		content.revalidate();
+		validate();
+	}
+
 
 
 	public void actionPerformed(ActionEvent e) 
@@ -660,6 +934,18 @@ public class Main extends Applet implements ActionListener
 		else if(e.getActionCommand().equals(btn_name[1]))	//장바구니 조회
 		{
 			shoppingList();
+		}
+		else if(e.getActionCommand().equals(btn_name[2]))	//메일 보내기
+		{
+			sendMail();
+		}
+		else if(e.getActionCommand().equals(btn_name[3]))	//메일 보내기
+		{
+			mailBox();
+		}
+		else if(e.getActionCommand().equals(btn_name[4]))	//메일 보내기
+		{
+			addHotel();
 		}
 	}
 }
